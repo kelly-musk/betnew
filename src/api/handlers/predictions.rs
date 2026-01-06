@@ -1,22 +1,22 @@
 use axum::{
-    extract::{Path, State, Json},
+    extract::{Json, Path, State},
     http::StatusCode,
     response::IntoResponse,
 };
 use serde::Deserialize;
 use uuid::Uuid;
 
-use crate::core::models::{Prediction, CreatePredictionRequest};
+use crate::core::models::{CreatePredictionRequest, Prediction};
 use crate::infrastructure::database::DbPool;
 
 #[derive(Debug, Deserialize, validator::Validate)]
 pub struct CreatePredictionRequest {
     #[validate(length(min = 1, max = 200))]
     pub event_id: Uuid,
-    
+
     #[validate(length(min = 1, max = 100))]
     pub predicted_outcome: String,
-    
+
     #[validate(range(min = 0, max = 100))]
     pub confidence: i32,
 }
@@ -28,7 +28,7 @@ pub async fn create_prediction(
 ) -> Result<impl IntoResponse, AppError> {
     // Validate input
     payload.validate()?;
-    
+
     // Check if event is still open
     let event = sqlx::query_as!(
         Event,
@@ -37,14 +37,14 @@ pub async fn create_prediction(
     )
     .fetch_optional(&pool)
     .await?;
-    
+
     if event.is_none() {
         return Err(AppError::EventClosed);
     }
-    
+
     // Create prediction
     let prediction_id = Uuid::new_v4();
-    
+
     sqlx::query!(
         r#"
         INSERT INTO predictions 
@@ -59,12 +59,12 @@ pub async fn create_prediction(
     )
     .execute(&pool)
     .await?;
-    
+
     Ok((
         StatusCode::CREATED,
         Json(serde_json::json!({
             "id": prediction_id,
             "message": "Prediction created successfully"
-        }))
+        })),
     ))
 }

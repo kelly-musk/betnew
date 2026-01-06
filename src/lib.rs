@@ -12,13 +12,14 @@ mod api {
 pub mod core {
     pub mod models {
         pub mod user;
+        pub mod Predictions;
     }
     pub mod services {
         pub mod scoring;
     }
 }
 
-pub mod infrastructure {
+mod infrastructure {
     pub mod cache {}
     pub mod db {}
 }
