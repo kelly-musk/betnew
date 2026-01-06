@@ -1,5 +1,10 @@
-pub mod api {
-    pub mod handler {}
+mod api {
+    mod handlers {
+        pub mod auth;
+        pub mod events;
+        pub mod leaderboard;
+        pub mod predictions;
+    }
     pub mod middleware {}
     pub mod routes;
 }
@@ -8,9 +13,12 @@ pub mod core {
     pub mod models {
         pub mod user;
     }
+    pub mod services {
+        pub mod scoring;
+    }
 }
 
-pub mod infastructure{
-    pub mod cache{}
-    pub mod db{}
+pub mod infrastructure {
+    pub mod cache {}
+    pub mod db {}
 }
